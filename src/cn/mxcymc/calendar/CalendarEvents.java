@@ -10,32 +10,37 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class CalendarEvents implements Listener{
+public class CalendarEvents implements Listener {
+
     public Main plugin;
-    
-    public CalendarEvents(Main m){
-        this.plugin=m;
+
+    public CalendarEvents(Main m) {
+        this.plugin = m;
     }
-    
+
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent e){
-        if (!Main.config.getBoolean("open_gui_on_join"))return;
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        if (!Main.config.getBoolean("open_gui_on_join")) {
+            return;
+        }
         Player player = e.getPlayer();
         this.plugin.openGui(player);
     }
-    
+
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent e){
+    public void onPlayerInteract(PlayerInteractEvent e) {
         Action action = e.getAction();
-        if(action==Action.RIGHT_CLICK_AIR||action==Action.RIGHT_CLICK_BLOCK){
+        if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
             Player player = e.getPlayer();
             ItemStack item = player.getInventory().getItemInMainHand();
-            if (plugin.getReplenish().isCard(item))this.plugin.openGui(player);
+            if (plugin.getReplenish().isCard(item)) {
+                this.plugin.openGui(player);
+            }
         }
     }
-    
+
     @EventHandler
-    public void onPlayerSignInEvent(PlayerSignInEvent e){
+    public void onPlayerSignInEvent(PlayerSignInEvent e) {
     }
-    
+
 }
