@@ -1,8 +1,9 @@
 name: Calendar
 main: cn.mxcymc.calendar.Main
-version: 0.1
+version: 0.2
 depend: [VexView]
+softdepend: [Lunar]
 commands:
     calendar:
-      aliases: 
+      aliases:
       - qiandao

@@ -19,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 
     private static final File FILE = new File("plugins/Calendar", "config.yml");
+    static boolean lunar;
     public Database database;
     private static HashMap<String, CalendarGui> map;
     public static FileConfiguration config;
@@ -50,6 +51,7 @@ public class Main extends JavaPlugin {
             this.onDisable();
         }
         Bukkit.getPluginManager().registerEvents(new CalendarEvents(this), this);
+        lunar = Bukkit.getPluginManager().getPlugin("Lunar").isEnabled();
     }
 
     @Override

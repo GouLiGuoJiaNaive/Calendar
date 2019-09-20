@@ -1,6 +1,8 @@
 package cn.mxcymc.calendar;
 
 import cn.mxcymc.calendar.listener.PlayerSignInEvent;
+import cn.mxcymc.www.Lunar;
+import cn.mxcymc.www.LunarDate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -119,7 +121,12 @@ public final class CalendarGui {
                         if (!month_list.contains(String.valueOf(name))) {
                             sign(name);
                         }
-                    }, new VexHoverText(Arrays.asList("\u00a76" + parseDate(this.lookyear, this.lookmonth - 1, name), Main.Message(month_list.contains(String.valueOf(name)) ? "signed" : "sign"))));
+                    }, new VexHoverText(Arrays.asList(
+                            "\u00a76" + parseDate(this.lookyear, this.lookmonth - 1, name),
+                            Main.Message(month_list.contains(String.valueOf(name)) ? "signed" : "sign"),
+                            this.parseLunar(this.lookyear, this.lookmonth, name),
+                            this.parseFestival(this.lookyear, this.lookmonth, name)
+                    )));
                 } else if (this.lookmonth == today_month && name < today_day) {
                     a = new VexButton("date" + i, color + name, "[local]calendar/blank.png", "[local]calendar/green.png", 66 + 24 * col, 16 + 24 * row, 24, 24, (Player p1) -> {
                         if (!month_list.contains(String.valueOf(name))) {
@@ -129,8 +136,13 @@ public final class CalendarGui {
                                 replenish(name);
                             }
                         }
-                    }, new VexHoverText(Arrays.asList("\u00a76" + parseDate(this.lookyear, this.lookmonth - 1, name), Main.Message(month_list.contains(String.valueOf(name)) ? "signed" : plugin.getReplenish().hasCard(player) ? "replenish" : "cannot_replenish"))));
-                } else if (this.lookmonth < today_month || this.lookyear < today_year) {
+                    }, new VexHoverText(Arrays.asList(
+                            "\u00a76" + parseDate(this.lookyear, this.lookmonth - 1, name),
+                            Main.Message(month_list.contains(String.valueOf(name)) ? "signed" : plugin.getReplenish().hasCard(player) ? "replenish" : "cannot_replenish"),
+                            this.parseLunar(this.lookyear, this.lookmonth, name),
+                            this.parseFestival(this.lookyear, this.lookmonth, name)
+                    )));
+                } else if (this.lookyear == today_year && this.lookmonth < today_month || this.lookyear < today_year) {
                     instance.set(lookyear, today_month - 1, 1);
                     int nextstartDay = instance.get(Calendar.DAY_OF_WEEK);
                     int nextcount = nextstartDay - 1;
@@ -139,13 +151,26 @@ public final class CalendarGui {
                             if (!week_list.contains(String.valueOf(name))) {
                                 replenishWeek(name);
                             }
-                        }, new VexHoverText(Arrays.asList("\u00a76" + parseDate(this.lookyear, this.lookmonth - 1, name), Main.Message(month_list.contains(String.valueOf(name)) ? "signed" : plugin.getReplenish().hasCard(player) ? "replenish" : "cannot_replenish"))));
+                        }, new VexHoverText(Arrays.asList(
+                                "\u00a76" + parseDate(this.lookyear, this.lookmonth - 1, name),
+                                Main.Message(month_list.contains(String.valueOf(name)) ? "signed" : plugin.getReplenish().hasCard(player) ? "replenish" : "cannot_replenish"),
+                                this.parseLunar(this.lookyear, this.lookmonth, name),
+                                this.parseFestival(this.lookyear, this.lookmonth, name)
+                        )));
 
                     } else {
-                        a = new VexButton("date" + i, color + name, "[local]calendar/blank.png", "[local]calendar/blank.png", 66 + 24 * col, 16 + 24 * row, 24, 24, new VexHoverText(Arrays.asList("\u00a76" + parseDate(this.lookyear, this.lookmonth - 1, name), Main.Message("sign_disabled"))));
+                        a = new VexButton("date" + i, color + name, "[local]calendar/blank.png", "[local]calendar/blank.png", 66 + 24 * col, 16 + 24 * row, 24, 24, new VexHoverText(Arrays.asList(
+                                "\u00a76" + parseDate(this.lookyear, this.lookmonth - 1, name), Main.Message("sign_disabled"),
+                                this.parseLunar(this.lookyear, this.lookmonth, name),
+                                this.parseFestival(this.lookyear, this.lookmonth, name)
+                        )));
                     }
                 } else {
-                    a = new VexButton("date" + i, color + name, "[local]calendar/blank.png", "[local]calendar/blank.png", 66 + 24 * col, 16 + 24 * row, 24, 24, new VexHoverText(Arrays.asList("\u00a76" + parseDate(this.lookyear, this.lookmonth - 1, name), Main.Message("sign_not_open"))));
+                    a = new VexButton("date" + i, color + name, "[local]calendar/blank.png", "[local]calendar/blank.png", 66 + 24 * col, 16 + 24 * row, 24, 24, new VexHoverText(Arrays.asList(
+                            "\u00a76" + parseDate(this.lookyear, this.lookmonth - 1, name), Main.Message("sign_not_open"),
+                            this.parseLunar(this.lookyear, this.lookmonth, name),
+                            this.parseFestival(this.lookyear, this.lookmonth, name)
+                    )));
                 }
                 gui.addComponent(a);
 
@@ -154,7 +179,7 @@ public final class CalendarGui {
                 }
             }
         }
-        VexButton a = new VexButton("gui3" + 2, "<<", "[local]calendar/blank.png", "[local]calendar/green.png", 132 / 2, 320 / 2, 24, 24, (Player p1) -> {
+        VexButton a = new VexButton("gui3" + 2, "\u00a7c<<", "[local]calendar/blank.png", "[local]calendar/green.png", 132 / 2, 320 / 2, 24, 24, (Player p1) -> {
             if (this.lookyear > 0) {
                 this.lookyear--;
             }
@@ -178,11 +203,11 @@ public final class CalendarGui {
             }
             openGui(p1);
         }, new VexHoverText(Arrays.asList(Main.Message("add_month"))));
-        VexButton d = new VexButton("gui3" + 5, ">>", "[local]calendar/blank.png", "[local]calendar/green.png", 420 / 2, 320 / 2, 24, 24, (Player p1) -> {
+        VexButton d = new VexButton("gui3" + 5, "\u00a7c>>", "[local]calendar/blank.png", "[local]calendar/green.png", 420 / 2, 320 / 2, 24, 24, (Player p1) -> {
             this.lookyear++;
             openGui(p1);
         }, new VexHoverText(Arrays.asList(Main.Message("add_year"))));
-        VexButton text = new VexButton("gui3" + 6, "\u00a76" + parseMonth(this.lookyear, this.lookmonth - 1), "[local]calendar/blank.png", "[local]calendar/blank.png", 228 / 2, 320 / 2, 144 / 2, 24);
+        VexButton text = new VexButton("gui3" + 6, "\u00a76" + parseMonth(this.lookyear, this.lookmonth - 1), "[local]calendar/blank.png", "[local]calendar/blank.png", 228 / 2, 320 / 2, 144 / 2, 24, new VexHoverText(Arrays.asList("\u00a7c" + LunarDate.getYear(lookyear, lookmonth, 1))));
         gui.addComponent(a);
         gui.addComponent(b);
         gui.addComponent(c);
@@ -379,4 +404,21 @@ public final class CalendarGui {
         return history.toString().contains(format);
     }
 
+    private String parseLunar(int y, int m, int d) {
+        if (!Main.lunar) {
+            return "";
+        }
+        String lunar = LunarDate.getLunar(y, m, d).contains("初一") ? LunarDate.getLunar(y, m, d).replace("大年", "正月").split("月")[0] + "月" : LunarDate.getLunar(y, m, d).replace("大年", "正月").split("月")[1];
+        if (!LunarDate.getSolarTerms(y, m, d).equals("")) {
+            lunar = LunarDate.getSolarTerms(y, m, d);
+        }
+        return lunar;
+    }
+
+    private String parseFestival(int y, int m, int d) {
+        if (!Main.lunar) {
+            return "";
+        }
+        return Lunar.getFestival(y, m, d);
+    }
 }
